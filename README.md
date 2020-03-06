@@ -1,4 +1,3 @@
-
 # A/B Testing - Lab
 
 ## Introduction
@@ -22,7 +21,8 @@ State your null hypothesis here (be sure to make it quantitative as before)
 
 
 ```python
-# H_0 = Your null hypothesis
+#null hypothesis there is no difference in response rates between the new template and old.
+H_0 = 0.05
 ```
 
 ## Step 2: State the Alternative Hypothesis, $H_1$
@@ -31,7 +31,8 @@ State your alternative hypothesis here (be sure to make it quantitative as befor
 
 
 ```python
-# H_1 = Your alternative hypothesis
+# there is a 0.01 difference in response rate
+H_1 = 0.06
 ```
 
 ## Step 3: Calculate n for standard alpha and power thresholds
@@ -43,8 +44,24 @@ To start, arbitrarily set $\alpha$ to 0.05. From this, calculate the required sa
 
 
 ```python
-# Calculate the required sample size
+from statsmodels.stats.power import TTestIndPower, TTestPower
 ```
+
+
+```python
+# Calculate the required sample size
+alpha = 0.05
+power = 0.8
+power_analysis = TTestIndPower()
+power_analysis.solve_power(effect_size=0.01/0.0475, alpha=alpha, power=power, alternative='larger')
+```
+
+
+
+
+    279.6667468021971
+
+
 
 ## Step 4: Plot Power Curves for Alternative Experiment Formulations
 
@@ -52,8 +69,64 @@ While you now know how many observations you need in order to run a t-test for t
 
 
 ```python
-#Your code; plot power curves for the various alpha and effect size combinations
+import pandas as pd
+import numpy as np
 ```
+
+
+```python
+#Your code; plot power curves for the various alpha and effect size combinations
+
+
+```
+
+
+    ---------------------------------------------------------------------------
+
+    TypeError                                 Traceback (most recent call last)
+
+    <ipython-input-24-cb59c72bd961> in <module>
+          2 alphas = [0.01, 0.05, 0.1]
+          3 size_diff = [0.005, 0.01, 0.02, 0.03]
+    ----> 4 effect_sizes = size_diff / 0.0475
+          5 sample_sizes = range(10,500,10)
+          6 #create figure plots
+
+
+    TypeError: unsupported operand type(s) for /: 'list' and 'float'
+
+
+
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_style('darkgrid')
+```
+
+    /opt/anaconda3/envs/learn-env/lib/python3.6/importlib/_bootstrap.py:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
+      return f(*args, **kwds)
+
+
+
+```python
+alphas = [0.01, 0.05, 0.1]
+size_diff = np.array([0.005, 0.01, 0.02, 0.03])
+effect_sizes = size_diff / 0.0475
+sample_sizes = np.arange(10,500,10)
+#create figure plots
+fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(15,20))
+for n in range(len(alphas)):
+    ax = axes[n]
+    alpha = alphas[n]
+    
+    power_analysis.plot_power(dep_var='nobs', nobs=sample_sizes, effect_size=effect_sizes, alpha=alpha, ax=ax)
+    ax.set_title("Power of test at alpha value {}".format(alpha))
+    ax.set_ylabel('Power')
+```
+
+
+![png](index_files/index_13_0.png)
+
 
 ## Step 5: Propose a Final Experimental Design
 
@@ -61,10 +134,7 @@ Finally, now that you've explored some of the various sample sizes required for 
 
 ### Your answer here
 
-
-```python
-
-```
+Sending to 200 people we can get a power level above 0.8, for all effect sizes 0.42 and above. Sending to 300-400 people, we can get a fairly good power level above 0.8 for alphas above 0.05 and an lower effect size of 0.21. The power is very low for effect sizes at 0.11 for all observations. So a change in 0.1 percent is not very useful, and could be due to chance.
 
 ## Summary
 
